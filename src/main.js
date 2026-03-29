@@ -16,6 +16,10 @@ class HelloScene extends Phaser.Scene {
     this.currentAnimation = 'thinking';
     this.walkSpeed = 0; //200 defualt
     this.direction = 1;
+    
+    this.started = false;
+    this.currentPrompt = 'none'
+    this.currentPressedKey = 'none'
   }
   
   preload() {
@@ -25,20 +29,12 @@ class HelloScene extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale;
-    
-    /** Text */
-    this.add
-      .text(width / 2, 20, 'Hello world — shared man Spine walks (public/spine/man/)', {
-        fontSize: '14px',
-        color: '#eaeaea',
-        fontFamily: 'system-ui, sans-serif'
-      })
-      .setOrigin(0.5, 0);
 
-    this.add
-      .text(width / 2, 44, 'Gray silhouette = CDN placeholder base sheet; npm run copy-spine for real skin', {
-        fontSize: '11px',
-        color: '#8a9',
+    const introduction = 'Simon Says — Press SPACE to begin!';
+    const gameMessage = this.add
+      .text(width / 2, 20, introduction, {
+        fontSize: '25px',
+        color: '#eaeaea',
         fontFamily: 'system-ui, sans-serif'
       })
       .setOrigin(0.5, 0);
@@ -57,15 +53,53 @@ class HelloScene extends Phaser.Scene {
     this.hero.animationState.setAnimation(0, this.currentAnimation, true);
     this.hero.skeleton.scaleX = Math.abs(this.hero.skeleton.scaleX);
 
+    /** GameLogic */
+
+
+    const prompts = {
+      jump   : 'Simon Says Jump',
+      noJump : 'Jump',
+      crouch   : 'Simon Says Crouch',
+      noCrouch : 'Crouch'
+    };
+
+    const gameOver = () => {
+      gameMessage.setText('SIMON DID NOT SAY THAT - GAME OVER!');
+      gameMessage.setFontSize('25px')
+
+      this.promptTimer.remove();
+      this.currentPrompt = 'none';
+      this.currentPressedKey = 'none';
+
+      this.time.delayedCall(5000, () => {
+        gameMessage.setText(introduction);
+        gameMessage.setFontSize('25px')
+        this.started = false;
+        this.walkSpeed = 0;
+        this.direction = 1;
+      });
+    };
+
     /** Key Bindings */
     this.input.keyboard?.on('keydown-W', () => {
       this.hero.animationState.setAnimation(0, DEMO_JUMP, false);
       this.hero.animationState.addAnimation(0, this.currentAnimation, true, 0);
+      
+      if(this.currentPrompt !== prompts.jump && this.currentPrompt !== 'none') {
+        console.log("Wrong Key Pressed!");
+        gameOver();
+      }
+
     });
 
     this.input.keyboard?.on('keydown-S', () => {
       this.hero.animationState.setAnimation(0, 'BlockCrouch', false);
       this.hero.animationState.addAnimation(0, this.currentAnimation, true, 0);
+
+      if(this.currentPrompt !== prompts.crouch && this.currentPrompt !== 'none') {
+        console.log("Wrong Key Pressed!");
+        gameOver();
+      }
     });
 
     this.input.keyboard?.on('keydown-A', () => {
@@ -85,6 +119,33 @@ class HelloScene extends Phaser.Scene {
     this.input.keyboard?.on('keydown-Q', () => {
       if(this.walkSpeed > 0) this.walkSpeed -= 50;
     });
+
+    this.input.keyboard?.on('keydown-SPACE', () => {
+      if(this.started === false) {
+        this.started = true;
+        const delay = 1000; // 1 second
+        const timer = ['1', '2', '3', "START!"];
+
+        timer.forEach((t, i) => {
+          this.time.delayedCall(delay * (i + 1), () => {
+            gameMessage.setText(t);
+            gameMessage.setFontSize('100px')
+          })
+        })
+
+        this.time.delayedCall(delay * timer.length, () => {
+          this.promptTimer = this.time.addEvent({
+            delay: 2000,
+            loop: true,
+            callback: () => {
+              this.currentPrompt = Phaser.Utils.Array.GetRandom(Object.values(prompts));
+              gameMessage.setText(this.currentPrompt);
+              gameMessage.setFontSize('25px')
+            }
+          })
+        })
+     }
+    })
 
   }
    
