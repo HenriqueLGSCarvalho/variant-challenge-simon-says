@@ -1,1 +1,1 @@
-# Variant Game Challenge — Simon Says — Henrique Luciano Carvalho
+# Variant Game Challenge — Simon Says
