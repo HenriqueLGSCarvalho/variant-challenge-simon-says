@@ -54,7 +54,7 @@ class HelloScene extends Phaser.Scene {
     this.hero.setDepth(10);
     this.hero.setScale(0.28);
     this.hero.animationState.data.defaultMix = 0.15;
-    this.hero.animationState.setAnimation(0, 'thinking', true);
+    this.hero.animationState.setAnimation(0, this.currentAnimation, true);
     this.hero.skeleton.scaleX = Math.abs(this.hero.skeleton.scaleX);
 
     /** Key Bindings */
@@ -79,14 +79,11 @@ class HelloScene extends Phaser.Scene {
     });
 
     this.input.keyboard?.on('keydown-E', () => {
-      this.walkSpeed += 50
+      if(this.walkSpeed < 5000)  this.walkSpeed += 50;
     });
 
     this.input.keyboard?.on('keydown-Q', () => {
-
-      if(this.walkSpeed > 0) {
-        this.walkSpeed -= 50;
-      }
+      if(this.walkSpeed > 0) this.walkSpeed -= 50;
     });
 
   }
