@@ -81,45 +81,54 @@ class HelloScene extends Phaser.Scene {
     };
 
     /** Key Bindings */
+
+    // Jump
     this.input.keyboard?.on('keydown-W', () => {
       this.hero.animationState.setAnimation(0, DEMO_JUMP, false);
       this.hero.animationState.addAnimation(0, this.currentAnimation, true, 0);
       
       if(this.currentPrompt !== prompts.jump && this.currentPrompt !== 'none') {
-        console.log("Wrong Key Pressed!");
+        console.log("Wrong Key Pressed! Simon did not say to jump");
         gameOver();
       }
 
     });
 
+    // Crouch
     this.input.keyboard?.on('keydown-S', () => {
       this.hero.animationState.setAnimation(0, 'BlockCrouch', false);
       this.hero.animationState.addAnimation(0, this.currentAnimation, true, 0);
 
       if(this.currentPrompt !== prompts.crouch && this.currentPrompt !== 'none') {
-        console.log("Wrong Key Pressed!");
+        console.log("Wrong Key Pressed! Simon did not say to crouch");
         gameOver();
       }
     });
-
+    
+    // Turn Left
     this.input.keyboard?.on('keydown-A', () => {
       this.hero.skeleton.scaleX = -Math.abs(this.hero.skeleton.scaleX);
       this.direction = -1;
     });
-
+    
+    // Turn Right
     this.input.keyboard?.on('keydown-D', () => {
       this.hero.skeleton.scaleX = Math.abs(this.hero.skeleton.scaleX);
       this.direction = 1;
     });
-
+    
+    // Increase Speed (up to speedLimit)
     this.input.keyboard?.on('keydown-E', () => {
-      if(this.walkSpeed < 5000)  this.walkSpeed += 50;
+      const speedLimit = 5000
+      if(this.walkSpeed < speedLimit)  this.walkSpeed += 50;
     });
 
+    // Decrease Speed (down to zero)
     this.input.keyboard?.on('keydown-Q', () => {
       if(this.walkSpeed > 0) this.walkSpeed -= 50;
     });
-
+    
+    // Start Game
     this.input.keyboard?.on('keydown-SPACE', () => {
       if(this.started === false) {
         this.started = true;
@@ -211,3 +220,7 @@ const config = {
 };
 
 new Phaser.Game(config);
+
+// TODO
+// - Score System
+// - Add more prompts
