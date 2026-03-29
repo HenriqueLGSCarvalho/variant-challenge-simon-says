@@ -80,6 +80,7 @@ class HelloScene extends Phaser.Scene {
   }
 }
 
+/** Game configurations - Keep the same for now*/
 const config = {
   type: Phaser.WEBGL,
   parent: 'app',
