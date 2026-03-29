@@ -18,8 +18,10 @@ class HelloScene extends Phaser.Scene {
     this.direction = 1;
     
     this.started = false;
-    this.currentPrompt = 'none'
-    this.currentPressedKey = 'none'
+    this.currentPromptKey = 'none';
+    this.currentPrompt = 'none';
+    this.currentAction = 'none';
+    this.score = 0;
   }
   
   preload() {
@@ -30,19 +32,19 @@ class HelloScene extends Phaser.Scene {
   create() {
     const { width, height } = this.scale;
 
-    const introduction = 'Simon Says — Press SPACE to begin!';
+    const introduction = 'Henrique Says — Press SPACE to begin!';
     const gameMessage = this.add
       .text(width / 2, 20, introduction, {
         fontSize: '25px',
-        color: '#eaeaea',
+        color: 'rgb(139, 185, 137)',
         fontFamily: 'system-ui, sans-serif'
       })
       .setOrigin(0.5, 0);
 
-    this.add
-      .text(width / 2, height - 36, 'Animations: public/spine/man/animations.json & ANIMATIONS.md', {
-        fontSize: '16px',
-        color: '#889'
+    const scoreboard = this.add
+      .text(width / 2, height - 36, `Score: ${this.score}`, {
+        fontSize: '25px',
+        color: 'rgb(139, 185, 137)'
       })
       .setOrigin(0.5, 1);
 
@@ -57,19 +59,22 @@ class HelloScene extends Phaser.Scene {
 
 
     const prompts = {
-      jump   : 'Simon Says Jump',
-      noJump : 'Jump',
-      crouch   : 'Simon Says Crouch',
-      noCrouch : 'Crouch'
+      jump      : 'Henrique Says Jump',
+      no_Jump   : 'Jump',
+      crouch    : 'Henrique Says Crouch',
+      no_Crouch : 'Crouch',
+      dance     : 'Henrique Says Dance',
+      no_dance  : 'Dance'
     };
 
     const gameOver = () => {
-      gameMessage.setText('SIMON DID NOT SAY THAT - GAME OVER!');
+      gameMessage.setText('Incorrect Action! Henrique is sad :(');
       gameMessage.setFontSize('25px')
 
       this.promptTimer.remove();
+      this.currentAction = 'none';
+      this.currentPromptKey = 'none'
       this.currentPrompt = 'none';
-      this.currentPressedKey = 'none';
 
       this.time.delayedCall(5000, () => {
         gameMessage.setText(introduction);
@@ -77,21 +82,24 @@ class HelloScene extends Phaser.Scene {
         this.started = false;
         this.walkSpeed = 0;
         this.direction = 1;
+        this.score = -1;
       });
     };
 
     /** Key Bindings */
 
-    // Jump
-    this.input.keyboard?.on('keydown-W', () => {
-      this.hero.animationState.setAnimation(0, DEMO_JUMP, false);
+    // Dance
+    this.input.keyboard?.on('keydown-J', () => {
+      this.hero.animationState.setAnimation(0, 'Dance', false);
       this.hero.animationState.addAnimation(0, this.currentAnimation, true, 0);
       
-      if(this.currentPrompt !== prompts.jump && this.currentPrompt !== 'none') {
-        console.log("Wrong Key Pressed! Simon did not say to jump");
+      
+      if(this.currentPrompt !== prompts.dance && this.currentPrompt !== 'none') {
+        console.log("Wrong Key Pressed! Simon did not say to dance");
         gameOver();
-      }
-
+      } else if(this.started) {
+        this.currentAction = 'dance'
+      } 
     });
 
     // Crouch
@@ -102,6 +110,21 @@ class HelloScene extends Phaser.Scene {
       if(this.currentPrompt !== prompts.crouch && this.currentPrompt !== 'none') {
         console.log("Wrong Key Pressed! Simon did not say to crouch");
         gameOver();
+      } else if(this.started) {
+        this.currentAction = 'crouch'
+      }
+    });
+
+    // Jump
+    this.input.keyboard?.on('keydown-W', () => {
+      this.hero.animationState.setAnimation(0, DEMO_JUMP, false);
+      this.hero.animationState.addAnimation(0, this.currentAnimation, true, 0);
+      
+      if(this.currentPrompt !== prompts.jump && this.currentPrompt !== 'none') {
+        console.log("Wrong Key Pressed! Simon did not say to jump");
+        gameOver();
+      } else if(this.started) {
+        this.currentAction = 'jump'
       }
     });
     
@@ -143,13 +166,24 @@ class HelloScene extends Phaser.Scene {
         })
 
         this.time.delayedCall(delay * timer.length, () => {
+          this.currentAction = 'none' // in case players make an action during the timer stage
           this.promptTimer = this.time.addEvent({
             delay: 2000,
             loop: true,
             callback: () => {
-              this.currentPrompt = Phaser.Utils.Array.GetRandom(Object.values(prompts));
+              if(!this.currentPromptKey.includes("no_") && this.currentPromptKey != this.currentAction) {
+                console.log("Did not press a key! Must respond to simon");
+                gameOver();
+                return;
+              }
+              this.score++; // at 2 second intervals, max score after 1min is 31 (the +1 coming from game start)
+              scoreboard.setText(`Score: ${this.score}`)
+
+              this.currentPromptKey = Phaser.Utils.Array.GetRandom(Object.keys(prompts));
+              this.currentPrompt    = prompts[this.currentPromptKey];
+
               gameMessage.setText(this.currentPrompt);
-              gameMessage.setFontSize('25px')
+              gameMessage.setFontSize('50px')
             }
           })
         })
@@ -173,7 +207,8 @@ class HelloScene extends Phaser.Scene {
      * =   72: Character walks the perfect distance before switching sides
      */
     const margin = 72; 
-
+    
+    /** Changes if the hero is standing still, walking, or running depending on its speed */
     if(this.walkSpeed >= 800 && this.currentAnimation !== 'Run') {
       this.hero.animationState.setAnimation(0, 'Run', true);
       this.currentAnimation = 'Run';
@@ -185,10 +220,6 @@ class HelloScene extends Phaser.Scene {
       this.currentAnimation = 'thinking';
     }
       
-
-
-    
-    
     //** flips hero's direction once they have passed the (w - margin) border */
     if (this.hero.x > w - margin) {
       this.hero.x = w - margin;
@@ -222,5 +253,4 @@ const config = {
 new Phaser.Game(config);
 
 // TODO
-// - Score System
 // - Add more prompts
