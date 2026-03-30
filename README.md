@@ -8,6 +8,8 @@ This project was coded to be compatible with PC, and you will only need a keyboa
 
 After starting the game, and after each prompt, there will be a 2-4 second delay before the next prompt appears. The user must correctly react to each prompt, or the game will end, showing you your final score for that round and allowing you to start a new game.
 
+While playing the game, you only need to press the button associated with the prompt once in order for it to lock in your answer. Pressing it multiple times is not an issue, but it runs the risk of the game moving on to the next prompt, and therefore, causing you to perform the incorrect action.
+
 ## Controls
 
 #### Cosmetic Keybinds :
