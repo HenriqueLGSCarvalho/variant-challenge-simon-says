@@ -1,1 +1,1 @@
-# Variant Game Challenge — Simon Says
+# Variant Game Challenge — Simon Says Remake
