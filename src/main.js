@@ -9,6 +9,8 @@ const VIEW_H = 1280;
 const DEMO_WALK = 'Walk';
 const DEMO_JUMP = 'Jump';
 
+const SIMON = 'Henrique';
+
 class HelloScene extends Phaser.Scene {
   constructor() {
     super({ key: 'HelloScene' });
@@ -34,7 +36,7 @@ class HelloScene extends Phaser.Scene {
     const { width, height } = this.scale;
     
     // Beginning Prompt for Users
-    const introduction = 'Henrique Says — Press SPACE to begin!';
+    const introduction = SIMON + 'Says — Press SPACE to begin!';
     const gameMessage = this.add
       .text(width / 2, 20, introduction, {
         fontSize: '25px',
@@ -61,25 +63,25 @@ class HelloScene extends Phaser.Scene {
     /** Game Logic */
 
     const prompts = {
-      jump         : 'Henrique Says Jump',
+      jump         : SIMON + ' Says Jump',
       no_Jump      : 'Jump',
-      crouch       : 'Henrique Says Crouch',
+      crouch       : SIMON + ' Says Crouch',
       no_Crouch    : 'Crouch',
-      dance        : 'Henrique Says Dance',
+      dance        : SIMON + ' Says Dance',
       no_dance     : 'Dance',
-      backflip     : 'Henrique Says Backflip',
+      backflip     : SIMON + ' Says Backflip',
       no_backflip  : 'Backflip',
-      play_dead    : 'Henrique Says Play Dead',
+      play_dead    : SIMON + ' Says Play Dead',
       no_play_dead : 'Play Dead',
-      call_mom     : 'Henrique Says Call Your Mom',
+      call_mom     : SIMON + ' Says Call Your Mom',
       no_call_mom  : 'Call Your Mom',
-      send_kiss    : 'Henrique Says Send Kiss',
+      send_kiss    : SIMON + ' Says Send Kiss',
       no_send_kiss : 'Send Kiss'
     };
     
     // Resets game state and prompts player that the game is over
     const gameOver = () => {
-      gameMessage.setText('Incorrect Action! Henrique is sad :(');
+      gameMessage.setText('Incorrect Action! ' + SIMON + ' is sad :(');
       gameMessage.setFontSize('25px')
 
       this.hero.animationState.setAnimation(0, 'CryingEffect', false);
