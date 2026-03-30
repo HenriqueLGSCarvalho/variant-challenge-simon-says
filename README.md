@@ -1,4 +1,4 @@
-# Variant Game Challenge — Simon Says Remake
+# Henrique Says — Simon Says Game (Javascript)
 
 ## Overview
 This project is a remake of the popular kid's game Simon Says using primarily the Spine and Phaser Libraries. I named it Henrique Says for a little personal touch. The rules are essentially identical to Simon Says; if a prompt includes "Henrique Says" you want to follow its instructions, if it doesn't, you don't want to follow it. 
